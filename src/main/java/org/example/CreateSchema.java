@@ -24,14 +24,20 @@ import com.google.cloud.contentwarehouse.v1.PropertyDefinition;
 import com.google.cloud.contentwarehouse.v1.TextTypeOptions;
 
 public class CreateSchema {
-  public static String PROJECT_NUMBER;
-  public static String LOCATION;
+  private String PROJECT_NUMBER;
+  private String LOCATION;
 
-  private final LocationName parent;
-
-  public CreateSchema() {
-    parent = LocationName.of(PROJECT_NUMBER, LOCATION);
+  public CreateSchema setProjectNumber(String projectNumber) {
+    this.PROJECT_NUMBER = projectNumber;
+    return this;
   }
+
+  public CreateSchema setLocation(String location) {
+    this.LOCATION = location;
+    return this;
+  }
+
+
   /**
    * Create a schema.
    */
@@ -79,7 +85,7 @@ public class CreateSchema {
             .setTextTypeOptions(TextTypeOptions.newBuilder().build())
             .build())
           .build();
-        DocumentSchema newDocumentSchema = documentSchemaServiceClient.createDocumentSchema(parent, documentSchema);
+        DocumentSchema newDocumentSchema = documentSchemaServiceClient.createDocumentSchema(LocationName.of(PROJECT_NUMBER, LOCATION), documentSchema);
         System.out.println("name");
         System.out.println("-------------------------------------------------------------------------");
         System.out.println(newDocumentSchema.getName());
@@ -90,17 +96,18 @@ public class CreateSchema {
   } // createSchema
 
   public static void main(String[] args) {
-    CreateSchema.PROJECT_NUMBER = System.getenv("PROJECT_NUMBER");
-    if (CreateSchema.PROJECT_NUMBER == null) {
+    String projectNumber = System.getenv("PROJECT_NUMBER");
+    if (projectNumber == null) {
       System.err.println("No PROJECT_NUMBER environment variable set");
       return;
     }
-    CreateSchema.LOCATION = System.getenv("LOCATION");
-    if (CreateSchema.LOCATION == null) {
-      CreateSchema.LOCATION = "us"; // Default to us location
+    String location = System.getenv("LOCATION");
+    if (location == null) {
+      location = "us"; // Default to us location
     }
 
     CreateSchema app = new CreateSchema();
+    app.setProjectNumber(projectNumber).setLocation(location);
     app.createSchema();
     System.out.println("CreateSchema completed");
   } // main

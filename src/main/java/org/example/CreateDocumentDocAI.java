@@ -34,11 +34,25 @@ import com.google.protobuf.ByteString;
 import java.io.FileInputStream;
 
 public class CreateDocumentDocAI {
-  public static String PROJECT_NUMBER;
-  public static String LOCATION;
-  public static String USERID;
+  private String PROJECT_NUMBER;
+  private String LOCATION;
+  private String USERID;
 
-  private final LocationName parent = LocationName.of(PROJECT_NUMBER, LOCATION);
+  public CreateDocumentDocAI setProjectNumber(String projectNumber) {
+    this.PROJECT_NUMBER = projectNumber;
+    return this;
+  }
+
+  public CreateDocumentDocAI setLocation(String location) {
+    this.LOCATION = location;
+    return this;
+  }
+
+  public CreateDocumentDocAI setUserId(String userId) {
+    this.USERID = userId;
+    return this;
+  }
+
 
   /**
    * Create a document.
@@ -80,7 +94,7 @@ public class CreateDocumentDocAI {
 
         CreateDocumentRequest createDocumentRequest = CreateDocumentRequest.newBuilder()
           .setDocument(document)
-          .setParent(parent.toString())
+          .setParent(LocationName.of(PROJECT_NUMBER, LOCATION).toString())
           .setRequestMetadata(requestMetadata)
           .build();
 
@@ -122,19 +136,19 @@ public class CreateDocumentDocAI {
   } // processDocAI
 
   public static void main(String[] args) {
-    CreateDocumentDocAI.PROJECT_NUMBER = System.getenv("PROJECT_NUMBER");
-    if (CreateDocumentDocAI.PROJECT_NUMBER == null) {
+    String projectNumber = System.getenv("PROJECT_NUMBER");
+    if (projectNumber == null) {
       System.err.println("No PROJECT_NUMBER environment variable set");
       return;
     }
-    CreateDocumentDocAI.USERID = System.getenv("USERID");
-    if (CreateDocumentDocAI.USERID == null) {
+    String userid = System.getenv("USERID");
+    if (userid == null) {
       System.err.println("No USERID environment variable set");
       return;
     }
-    CreateDocumentDocAI.LOCATION = System.getenv("LOCATION");
-    if (CreateDocumentDocAI.LOCATION == null) {
-      CreateDocumentDocAI.LOCATION = "us"; // Default to us location
+    String location = System.getenv("LOCATION");
+    if (location == null) {
+      location = "us"; // Default to us location
     }
 
     if (args.length < 2) {
@@ -150,6 +164,7 @@ public class CreateDocumentDocAI {
       // Read the document data into memory for passing to Document AI Warehouse.
       ByteString fileData = ByteString.readFrom(new FileInputStream(fileName));
       CreateDocumentDocAI app = new CreateDocumentDocAI();
+      app.setProjectNumber(projectNumber).setUserId(userid).setLocation(location);
       com.google.cloud.documentai.v1.Document docAiDocument = app.processDocAI(processorName, fileData);
       app.createDocument(schemaName, docAiDocument, fileData);
     } catch(Exception e) {

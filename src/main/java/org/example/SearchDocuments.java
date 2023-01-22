@@ -24,11 +24,23 @@ import com.google.cloud.contentwarehouse.v1.SearchDocumentsResponse;
 import com.google.cloud.contentwarehouse.v1.UserInfo;
 
 public class SearchDocuments {
-  public static String PROJECT_NUMBER;
-  public static String LOCATION;
-  public static String USERID;
+  private String PROJECT_NUMBER;
+  private String LOCATION;
+  private String USERID;
 
-  private final LocationName parent = LocationName.of(PROJECT_NUMBER, LOCATION);
+  public SearchDocuments setProjectNumber(String projectNumber) {
+    this.PROJECT_NUMBER = projectNumber;
+    return this;
+  }
+
+  public SearchDocuments setLocation(String location) {
+    this.LOCATION = location;
+    return this;
+  }
+
+  public void setUserId(String userId) {
+    this.USERID = userId;
+  }
 
   /**
    */
@@ -47,7 +59,7 @@ public class SearchDocuments {
 
         SearchDocumentsRequest searchDocumentsRequest = SearchDocumentsRequest.newBuilder()
           .setDocumentQuery(documentQuery)
-          .setParent(parent.toString())
+          .setParent(LocationName.of(PROJECT_NUMBER, LOCATION).toString())
           .setRequestMetadata(requestMetadata)
           .build();
 
@@ -66,19 +78,19 @@ public class SearchDocuments {
   } // searchDocuments
 
   public static void main(String[] args) {
-    SearchDocuments.PROJECT_NUMBER = System.getenv("PROJECT_NUMBER");
-    if (SearchDocuments.PROJECT_NUMBER == null) {
+    String projectNumber = System.getenv("PROJECT_NUMBER");
+    if (projectNumber == null) {
       System.err.println("No PROJECT_NUMBER environment variable set");
       return;
     }
-    SearchDocuments.USERID = System.getenv("USERID");
-    if (SearchDocuments.USERID == null) {
+    String userid = System.getenv("USERID");
+    if (userid == null) {
       System.err.println("No USERID environment variable set");
       return;
     }
-    SearchDocuments.LOCATION = System.getenv("LOCATION");
-    if (SearchDocuments.LOCATION == null) {
-      SearchDocuments.LOCATION = "us"; // Default to us location
+    String location = System.getenv("LOCATION");
+    if (location == null) {
+      location = "us"; // Default to us location
     }
     if (args.length < 1) {
       System.err.println("Usage: SearchDocument [QUERY]");
@@ -88,6 +100,7 @@ public class SearchDocuments {
     String query = args[0]; // Query string to look for.
     try {
       SearchDocuments app = new SearchDocuments();
+      app.setProjectNumber(projectNumber).setLocation(location).setUserId(userid);
       app.searchDocuments(query);
     } catch(Exception e) {
       e.printStackTrace();

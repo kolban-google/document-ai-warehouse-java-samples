@@ -20,10 +20,18 @@ import com.google.cloud.contentwarehouse.v1.DocumentSchemaServiceClient;
 import com.google.cloud.contentwarehouse.v1.LocationName;
 
 public class ListSchema {
-  public static String PROJECT_NUMBER;
-  public static String LOCATION;
+  private String PROJECT_NUMBER;
+  private String LOCATION;
 
-  private final LocationName parent = LocationName.of(PROJECT_NUMBER, LOCATION);
+  public ListSchema setProjectNumber(String projectNumber) {
+    this.PROJECT_NUMBER = projectNumber;
+    return this;
+  }
+
+  public ListSchema setLocation(String location) {
+    this.LOCATION = location;
+    return this;
+  }
 
   /**
    * List the schema that are defined in Document AI Warehouse.
@@ -31,7 +39,7 @@ public class ListSchema {
   public void listSchema() {
     try {
       try (DocumentSchemaServiceClient documentSchemaServiceClient = DocumentSchemaServiceClient.create()) {
-        DocumentSchemaServiceClient.ListDocumentSchemasPagedResponse response = documentSchemaServiceClient.listDocumentSchemas(parent);
+        DocumentSchemaServiceClient.ListDocumentSchemasPagedResponse response = documentSchemaServiceClient.listDocumentSchemas(LocationName.of(PROJECT_NUMBER, LOCATION));
         System.out.println("display name    name");
         System.out.println("--------------- ------------------------------------------------------------------------");
         for (DocumentSchema currentSchema: response.iterateAll()) {
@@ -44,17 +52,18 @@ public class ListSchema {
   } // listSchema
 
   public static void main(String[] args) {
-    ListSchema.PROJECT_NUMBER = System.getenv("PROJECT_NUMBER");
-    if (ListSchema.PROJECT_NUMBER == null) {
+    String projectNumber = System.getenv("PROJECT_NUMBER");
+    if (projectNumber == null) {
       System.err.println("No PROJECT_NUMBER environment variable set");
       return;
     }
-    ListSchema.LOCATION = System.getenv("LOCATION");
-    if (ListSchema.LOCATION == null) {
-      ListSchema.LOCATION = "us"; // Default to us location
+    String location = System.getenv("LOCATION");
+    if (location == null) {
+      location = "us"; // Default to us location
     }
 
     ListSchema app = new ListSchema();
+    app.setProjectNumber(projectNumber).setLocation(location);
     app.listSchema();
     System.out.println("ListSchema completed");
   } // main

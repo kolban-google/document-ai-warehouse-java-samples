@@ -21,7 +21,12 @@ import com.google.cloud.contentwarehouse.v1.RequestMetadata;
 import com.google.cloud.contentwarehouse.v1.UserInfo;
 
 public class DeleteDocument {
-  public static String USERID;
+  private String USERID;
+
+
+  public void setUserId(String userId) {
+    this.USERID = userId;
+  }
 
   /**
    * Delete a document.
@@ -47,8 +52,8 @@ public class DeleteDocument {
   } // deleteDocument
 
   public static void main(String[] args) {
-    DeleteDocument.USERID = System.getenv("USERID");
-    if (DeleteDocument.USERID == null) {
+    String userid = System.getenv("USERID");
+    if (userid == null) {
       System.err.println("No USERID environment variable set");
       return;
     }
@@ -61,6 +66,7 @@ public class DeleteDocument {
     String documentName = args[0];
 
     DeleteDocument app = new DeleteDocument();
+    app.setUserId(userid);
     app.deleteDocument(documentName);
     System.out.println("DeleteDocument completed");
   } // main
